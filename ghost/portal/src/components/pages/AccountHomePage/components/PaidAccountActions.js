@@ -1,5 +1,5 @@
 import AppContext from '../../../../AppContext';
-import {allowCompMemberUpgrade, getCompExpiry, getMemberSubscription, getMemberTierName, getUpdatedOfferPrice, hasMultipleProductsFeature, hasOnlyFreePlan, isComplimentaryMember, isInThePast, subscriptionHasFreeTrial} from '../../../../utils/helpers';
+import {getSimplecircSubscriptionUrl, allowCompMemberUpgrade, getCompExpiry, getMemberSubscription, getMemberTierName, getUpdatedOfferPrice, hasMultipleProductsFeature, hasOnlyFreePlan, isComplimentaryMember, isInThePast, subscriptionHasFreeTrial} from '../../../../utils/helpers';
 import {getDateString} from '../../../../utils/date-time';
 import {ReactComponent as LoaderIcon} from '../../../../images/icons/loader.svg';
 import {ReactComponent as OfferTagIcon} from '../../../../images/icons/offer-tag.svg';
@@ -136,6 +136,18 @@ const PaidAccountActions = () => {
         );
     };
 
+
+    /* Added for RoadRUNNER */
+    const PrintSubscriptionSection = () => (
+        <section>
+            <div className='gh-portal-list-detail'>
+                <h3>PRINT Subscription</h3>
+                <p>Manage your print magazine subscription</p>
+            </div>
+            <button className='gh-portal-btn gh-portal-btn-list' onClick={() => window.location = getSimplecircSubscriptionUrl()}>More</button>
+        </section>
+    );
+
     const subscription = getMemberSubscription({member});
     const isComplimentary = isComplimentaryMember({member});
     if (subscription || isComplimentary) {
@@ -163,6 +175,8 @@ const PaidAccountActions = () => {
                     <PlanUpdateButton isComplimentary={isComplimentary} />
                 </section>
                 <BillingSection isComplimentary={isComplimentary} defaultCardLast4={defaultCardLast4} />
+                { /* Added for RoadRUNNER */ }
+                <PrintSubscriptionSection />
             </>
         );
     }
