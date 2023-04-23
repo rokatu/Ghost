@@ -1,3 +1,28 @@
+# RoadRUNNER
+
+## Sync With Upstream
+
+```
+git fetch upstream main
+git rebase upstream/main
+```
+
+## Build
+
+```
+yarn build
+
+export SOURCE=umd/portal.min.js
+export HASH=$(md5 -q $SOURCE)
+export TARGET=umd/portal-$HASH.min.js
+cp $SOURCE $TARGET
+open umd/
+
+aws s3 cp $TARGET s3://assets.roadrunner.travel/ \
+  --acl public-read \
+  --cache-control max-age=2592000,public
+```
+
 # Portal
 
 [![npm version](https://badge.fury.io/js/%40tryghost%2Fportal.svg)](https://badge.fury.io/js/%40tryghost%2Fportal)
