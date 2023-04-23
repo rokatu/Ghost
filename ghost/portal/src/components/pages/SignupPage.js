@@ -7,7 +7,7 @@ import NewsletterSelectionPage from './NewsletterSelectionPage';
 import ProductsSection from '../common/ProductsSection';
 import InputForm from '../common/InputForm';
 import {ValidateInputForm} from '../../utils/form';
-import {getSiteProducts, getSitePrices, hasOnlyFreePlan, isInviteOnlySite, freeHasBenefitsOrDescription, hasOnlyFreeProduct, getFreeProductBenefits, getFreeTierDescription, hasFreeProductPrice, hasMultipleNewsletters, hasFreeTrialTier} from '../../utils/helpers';
+import {getSimplecircSubscriptionUrl, isPrintPlan, isFreePlan, getFreeTierTitle, getSiteProducts, getSitePrices, hasOnlyFreePlan, isInviteOnlySite, freeHasBenefitsOrDescription, hasOnlyFreeProduct, getFreeProductBenefits, getFreeTierDescription, hasFreeProductPrice, hasMultipleNewsletters, hasFreeTrialTier} from '../../utils/helpers';
 import {ReactComponent as InvitationIcon} from '../../images/icons/invitation.svg';
 
 export const SignupPageStyles = `
@@ -84,10 +84,12 @@ export const SignupPageStyles = `
 
 .gh-portal-signup-message {
     display: flex;
+    flex-direction: column; /* Added for RoadRUNNER */
+    text-align: center;     /* Added for RoadRUNNER */
     justify-content: center;
     color: var(--grey4);
     font-size: 1.5rem;
-    margin: 16px 0 0;
+    margin: 32px 0 0;       /* Modified for RoadRUNNER */
 }
 
 .gh-portal-signup-message,
@@ -373,7 +375,15 @@ class SignupPage extends React.Component {
     }
 
     doSignup() {
+        /* Added for RoadRUNNER */
+        const isPrint = isPrintPlan({planId: this.state.plan, site: this.context.site});
+
         this.setState((state) => {
+            /* Added for RoadRUNNER */
+            if (isPrint) {
+                return;
+            }
+
             return {
                 errors: this.getFormErrors(state)
             };
@@ -381,6 +391,13 @@ class SignupPage extends React.Component {
             const {site, onAction} = this.context;
             const {name, email, plan, errors} = this.state;
             const hasFormErrors = (errors && Object.values(errors).filter(d => !!d).length > 0);
+
+            /* Added for RoadRUNNER */
+            if (isPrint) {
+                window.location = `${getSimplecircSubscriptionUrl()}?email=${email}&name=${name}`;
+                return;
+            }
+
             if (!hasFormErrors) {
                 if (hasMultipleNewsletters({site})) {
                     this.setState({
@@ -482,7 +499,7 @@ class SignupPage extends React.Component {
                 errorMessage: errors.name || ''
             });
         }
-        fields[0].autoFocus = true;
+        fields[0].autoFocus = false; /* Modified for RoadRUNNER */
         if (fieldNames && fieldNames.length > 0) {
             return fields.filter((f) => {
                 return fieldNames.includes(f.name);
@@ -547,7 +564,16 @@ class SignupPage extends React.Component {
             return null;
         }
 
-        let label = t('Continue');
+        /* Added for RoadRUNNER */
+        let label = '';
+        if (isFreePlan({planId: this.state.plan})) {
+            label = `Start ${getFreeTierTitle({site}).toUpperCase()} Subscription`;
+        } else if (isPrintPlan({planId: this.state.plan, site})) {
+            label = 'Start PRINT Subscription';
+        } else {
+            label = 'Start WEB Subscription';
+        }
+
         const showOnlyFree = pageQuery === 'free' && hasFreeProductPrice({site});
 
         if (hasOnlyFreePlan({site}) || showOnlyFree) {
@@ -574,7 +600,7 @@ class SignupPage extends React.Component {
                 retry={retry}
                 onClick={e => this.handleSignup(e)}
                 disabled={disabled}
-                brandColor={brandColor}
+                brandColor="var(--secondaryBrandColor)" /* Modified for RoadRUNNER */
                 label={label}
                 isRunning={isRunning}
                 tabIndex='3'
@@ -623,14 +649,14 @@ class SignupPage extends React.Component {
             <div>
                 {this.renderFreeTrialMessage()}
                 <div className='gh-portal-signup-message'>
-                    <div>{t('Already a member?')}</div>
+                    <div>{t('Already a subscriber?')}</div>
                     <button
                         data-test-button='signin-switch'
                         className='gh-portal-btn gh-portal-btn-link'
                         style={{color: brandColor}}
                         onClick={() => onAction('switchPage', {page: 'signin'})}
                     >
-                        <span>{t('Sign in')}</span>
+                        <span>{t('Sign in to renew your subscription')}</span>
                     </button>
                 </div>
             </div>
@@ -736,17 +762,6 @@ class SignupPage extends React.Component {
         return null;
     }
 
-    renderFormHeader() {
-        const {site} = this.context;
-        const siteTitle = site.title || '';
-        return (
-            <header className='gh-portal-signup-header'>
-                {this.renderSiteLogo()}
-                <h1 className="gh-portal-main-title" data-testid='site-title-text'>{siteTitle}</h1>
-            </header>
-        );
-    }
-
     getClassNames() {
         const {site, pageQuery} = this.context;
         const plansData = getSitePrices({site, pageQuery});
@@ -791,13 +806,8 @@ class SignupPage extends React.Component {
                 </div>
                 <CloseButton />
                 <div className={'gh-portal-content signup ' + sectionClass}>
-                    {this.renderFormHeader()}
                     {this.renderForm()}
                 </div>
-                {/* <footer className={'gh-portal-signup-footer gh-portal-logged-out-form-container ' + footerClass}>
-                    {this.renderSubmitButton()}
-                    {this.renderLoginMessage()}
-                </footer> */}
             </>
         );
     }

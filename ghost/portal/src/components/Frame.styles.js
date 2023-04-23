@@ -892,7 +892,7 @@ const MobileStyles = `
         animation: popup-mobile 0.25s ease-in-out;
         box-shadow: none !important;
         transform: translateY(0);
-        padding: 28px !important;
+        padding: 10px !important; /* Modified for RoadRUNNER */
     }
 
     .gh-portal-popup-container.full-size {
@@ -961,6 +961,11 @@ const MobileStyles = `
         margin-top: 1px;
         padding: 0 74px;
         text-align: center;
+    }
+
+    /* Added for RoadRUNNER */
+    .gh-portal-content {
+        padding: 0px;
     }
 
     .gh-portal-input {
