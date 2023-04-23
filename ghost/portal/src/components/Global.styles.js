@@ -2,6 +2,7 @@ export const GlobalStyles = `
     /* Colors
     /* ----------------------------------------------------- */
     :root {
+        --secondaryBrandColor: #f60; /* Added for RoadRUNNER */
         --black: #000;
         --blackrgb: 0,0,0;
         --grey0: #1d1d1d;
