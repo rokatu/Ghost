@@ -5,6 +5,7 @@ import CloseButton from '../common/CloseButton';
 import AppContext from '../../AppContext';
 import InputForm from '../common/InputForm';
 import {ValidateInputForm} from '../../utils/form';
+import {getSimplecircLoginUrl} from '../../utils/helpers';
 
 export default class SigninPage extends React.Component {
     static contextType = AppContext;
@@ -12,6 +13,7 @@ export default class SigninPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            accountType: null,
             email: ''
         };
     }
@@ -23,6 +25,18 @@ export default class SigninPage extends React.Component {
                 page: 'accountHome'
             });
         }
+    }
+
+    /* Added for RoadRUNNER */
+    handleSelectWebAccount(e) {
+        e.preventDefault();
+        this.setState({accountType: 'web'});
+    }
+
+    /* Added for RoadRUNNER */
+    handleSelectPrintAccount(e) {
+        e.preventDefault();
+        window.location = getSimplecircLoginUrl();
     }
 
     handleSignin(e) {
@@ -98,6 +112,30 @@ export default class SigninPage extends React.Component {
         );
     }
 
+    /* Added for RoadRUNNER */
+    renderWebAccountButton() {
+        return (
+            <ActionButton
+                style={{width: '100%'}}
+                onClick={e => this.handleSelectWebAccount(e)}
+                brandColor={this.context.brandColor}
+                label="WEB Subscription Account"
+            />
+        );
+    }
+
+    /* Added for RoadRUNNER */
+    renderPrintAccountButton() {
+        return (
+            <ActionButton
+                style={{width: '100%'}}
+                onClick={e => this.handleSelectPrintAccount(e)}
+                brandColor="var(--secondaryBrandColor)"
+                label="PRINT Subscription Account"
+            />
+        );
+    }
+
     renderSignupMessage() {
         const {brandColor, t} = this.context;
         return (
@@ -144,18 +182,63 @@ export default class SigninPage extends React.Component {
     }
 
     renderFormHeader() {
-        // const siteTitle = this.context.site.title || 'Site Title';
         const {t} = this.context;
 
         return (
             <header className='gh-portal-signin-header'>
                 {this.renderSiteLogo()}
-                <h1 className="gh-portal-main-title">{t('Sign in')}</h1>
+                { this.state.accountType === null && (
+                    <h1 className="gh-portal-main-title">{t('Select Account Type')}</h1>
+                )}
+                { this.state.accountType === 'web' && (
+                    /* Added for RoadRUNNER */
+                    <>
+                        <h1 className="gh-portal-main-title">{t('Sign in')}</h1>
+                        <h3>WEB Subscription</h3>
+                    </>
+                )}
             </header>
         );
     }
 
+    /* Added for RoadRUNNER */
+    renderAccountTypeOptions() {
+        return (
+            <>
+                <div className='gh-portal-content signin'>
+                    <CloseButton />
+                    {this.renderFormHeader()}
+                </div>
+                <footer className='gh-portal-signin-footer'>
+                    <div className='gh-portal-signup-message'>
+                        <div style={{marginBottom: '16px'}}>
+                            Access your PRINT subscription account to renew your
+                            magazine subscription or update your physical
+                            mailing address.
+                        </div>
+                    </div>
+                    {this.renderPrintAccountButton()}
+                </footer>
+                <footer className='gh-portal-signin-footer'>
+                    <div className='gh-portal-signup-message'>
+                        <div style={{marginBottom: '16px'}}>
+                            Log into your WEB subscription account to update
+                            your email address, and manage your online
+                            subscription.
+                        </div>
+                    </div>
+                    {this.renderWebAccountButton()}
+                </footer>
+            </>
+        );
+    }
+
     render() {
+        /* Added for RoadRUNNER */
+        if (this.state.accountType === null) {
+            return this.renderAccountTypeOptions();
+        }
+
         return (
             <>
                 {/* <div className='gh-portal-back-sitetitle'>
