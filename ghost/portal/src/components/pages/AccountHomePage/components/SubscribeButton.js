@@ -22,7 +22,7 @@ const SubscribeButton = () => {
         <ActionButton
             dataTestId={'view-plans'}
             isRunning={isRunning}
-            label="View plans"
+            label="View Subscription Options"
             onClick={() => openPlanPage()}
             brandColor={brandColor}
             style={{width: '100%'}}
